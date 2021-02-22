@@ -218,7 +218,6 @@ private:
         return true;
     }
     static bool IsValidWord(const string& word) {
-        // A valid word must not contain special characters
         return none_of(word.begin(), word.end(), [](char c) {
             return c >= '\0' && c < ' ';
         });
@@ -227,10 +226,8 @@ private:
         string data;
         bool is_minus;
         bool is_stop;
-        //added
         bool is_invalid;
     };
-    // editing
     QueryWord ParseQueryWord(string text) const {
         bool is_minus = false;
         bool is_invalid = false;
@@ -253,7 +250,6 @@ private:
         set<string> plus_words;
         set<string> minus_words;
     };
-    // editing
     bool ParseQuery(const string& text, Query& query) const {
         for (const string& word : SplitIntoWords(text)) {
             QueryWord query_word = ParseQueryWord(word);
@@ -273,7 +269,6 @@ private:
         }
         return true;
     }
-    // Existence required
     double ComputeWordInverseDocumentFreq(const string& word) const {
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
