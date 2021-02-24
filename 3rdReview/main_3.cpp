@@ -206,8 +206,8 @@ private:
     }
 
     static bool OneMinusWord(const string& word) {
-        for (int i = 0; i < word.size(); ++i) {
-            if ((word[i] == '-' && word[i + 1] == '-') || (word[i] == '-' && word[i + 1] == ' ') || (word[word.size() - 1] == '-')) {
+        if (word[0] == '-'){
+            if (word[1] == '-' || word[word.size()-1] == '-'){
                 return false;
             }
         }
