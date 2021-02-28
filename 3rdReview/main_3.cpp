@@ -1,6 +1,7 @@
 
 // Извините пожалуйста за то, что снова пересоздал репозиторий, я случайно, понимаю, что так делать не стоит
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -24,6 +25,12 @@ int ReadLineWithNumber() {
     return result;
 }
 
+static bool IsValidWord(const string& word) {
+    return none_of(word.begin(), word.end(), [](char c) {
+        return c >= '\0' && c < ' ';
+    });
+}
+
 vector<string> SplitIntoWords(const string& text) {
     vector<string> words;
     string word;
@@ -38,6 +45,9 @@ vector<string> SplitIntoWords(const string& text) {
         }
     }
     if (!word.empty()) {
+        if (!IsValidWord(word)){
+            throw invalid_argument("Invalid word in query"s);
+        }
         words.push_back(word);
     }
     return words;
@@ -79,7 +89,7 @@ public:
     {
         for (const string &word : stop_words) {
             if (!IsValidWord(word)) {
-                throw invalid_argument("Invalid stop word in query"s);
+                throw invalid_argument("Invalid stop words in search server"s);
             }
         }
     }
@@ -96,17 +106,17 @@ public:
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
-            word_to_document_freqs_[word][document_id] += inv_word_count;
             if (!IsValidWord(word)){
-                throw invalid_argument("Invalid id in query"s);
+                throw invalid_argument("Invalid word in query"s);
             }
+            word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
     }
 
     template <typename DocumentPredicate>
     vector<Document> FindTopDocuments(const string& raw_query, DocumentPredicate document_predicate) const {
-        Query query =  ParseQuery(raw_query);
+        const Query query =  ParseQuery(raw_query);
         auto matched_documents = FindAllDocuments(query, document_predicate);
         sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
             if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
@@ -140,15 +150,14 @@ public:
         for (auto& document : documents_){
             if (i == index){
                 return document.first;
-            }else{
-                ++i;
             }
+            ++i;
         }
         throw out_of_range("Id is located out of range"s);
     }
 
     tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
-        const Query& query =  ParseQuery(raw_query);
+        const Query query =  ParseQuery(raw_query);
         vector<string> matched_words;
         for (const string& word : query.plus_words) {
             if (word_to_document_freqs_.count(word) == 0) {
@@ -205,19 +214,14 @@ private:
         return rating_sum / static_cast<int>(ratings.size());
     }
 
-    static bool OneMinusWord(const string& word) {
+    static bool IsValidMinusWord(const string& word) {
+        assert(word.empty() == 0);
         if (word[0] == '-'){
-            if (word[1] == '-' || word[word.size()-1] == '-'){
+            if ((word.size() > 1 && word[1] == '-') ||  (word[word.size()-1] == '-')){
                 return false;
             }
         }
         return true;
-    }
-
-    static bool IsValidWord(const string& word) {
-        return none_of(word.begin(), word.end(), [](char c) {
-            return c >= '\0' && c < ' ';
-        });
     }
 
     struct QueryWord {
@@ -228,7 +232,7 @@ private:
 
     QueryWord ParseQueryWord(string text) const {
         bool is_minus = false;
-        if (!OneMinusWord(text)) {
+        if (!IsValidMinusWord(text)) {
             throw invalid_argument("Invalid search query"s);
         }
         if (text[0] == '-') {
@@ -249,7 +253,7 @@ private:
     Query ParseQuery(const string& text) const {
         Query query;
         for (const string& word : SplitIntoWords(text)){
-            const QueryWord& query_word = ParseQueryWord(word);
+            const QueryWord query_word = ParseQueryWord(word);
             if (!query_word.is_stop){
                 if (query_word.is_minus){
                     query.minus_words.insert(query_word.data);
