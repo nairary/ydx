@@ -38,6 +38,9 @@ vector<string> SplitIntoWords(const string& text) {
         if (c == ' ') {
             if (!word.empty()) {
                 words.push_back(word);
+                if (!IsValidWord(word)){
+                    throw invalid_argument("Invalid word in query"s);
+                }
                 word.clear();
             }
         }else{
@@ -106,9 +109,6 @@ public:
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
         for (const string& word : words) {
-            if (!IsValidWord(word)){
-                throw invalid_argument("Invalid word in query"s);
-            }
             word_to_document_freqs_[word][document_id] += inv_word_count;
         }
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
