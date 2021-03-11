@@ -3,7 +3,7 @@
 RequestQueue::RequestQueue(const SearchServer& search_server)
     : search_server_(search_server){
 }
-    vector<Document> RequestQueue::AddFindRequest(const string& raw_query, DocumentStatus status) {
+std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentStatus status) {
         auto documents = search_server_.FindTopDocuments(raw_query, status);
 
         AddRequest(documents.empty());
@@ -11,7 +11,7 @@ RequestQueue::RequestQueue(const SearchServer& search_server)
         return documents;
     }
 
-    vector<Document> RequestQueue::AddFindRequest(const string& raw_query) {
+std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query) {
         auto documents = search_server_.FindTopDocuments(raw_query);
 
         AddRequest(documents.empty());
@@ -33,13 +33,10 @@ RequestQueue::RequestQueue(const SearchServer& search_server)
         if (query_result.is_empty) {
             ++no_result_request_count;
         }
-        RequestQueue::RemoveOldRequests();
-    }
-    void RequestQueue::RemoveOldRequests (){
         if (requests_.empty()){
             return;
         }
-        int out_dated_requests = requests_.back().time - requests_.front().time + 1 - sec_in_day_;
+        const int out_dated_requests = requests_.back().time - requests_.front().time + 1 - sec_in_day_;
         if (out_dated_requests <= 0) {
             return;
         }
@@ -50,5 +47,3 @@ RequestQueue::RequestQueue(const SearchServer& search_server)
             requests_.pop_front();
         }
     }
-
-
