@@ -2,14 +2,15 @@
 #include <cmath>
 
 
+
 SearchServer::SearchServer(const std::string &stop_words_text)
-    : SearchServer(SplitIntoWords(stop_words_text)){
+        : SearchServer(SplitIntoWords(stop_words_text)){
 }
 
 
 void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
     if ((document_id < 0) || (documents_.count(document_id) > 0)) {
-        throw std::invalid_argument("Invalid document_id"s);
+        throw std::invalid_argument(std::string("Invalid document_id"));
     }
     const auto words = SplitIntoWordsNoStop(document);
 
@@ -65,7 +66,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
 
 SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) const {
     if (text.empty()) {
-        throw std::invalid_argument("Query word is empty"s);
+        throw std::invalid_argument(std::string("Query word is empty"));
     }
     std::string word = text;
     bool is_minus = false;
@@ -74,7 +75,7 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(const std::string& text) co
         word = word.substr(1);
     }
     if (word.empty() || word[0] == '-' || !IsValidWord(word)) {
-        throw std::invalid_argument("Query word "s + text + " is invalid"s);
+        throw std::invalid_argument(std::string("Query word ") + text + std::string(" is invalid"));
     }
 
     return {word, is_minus, IsStopWord(word)};
@@ -99,13 +100,48 @@ double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) con
     return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
 }
 
+void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
+                 const std::vector<int>& ratings) {
+    try {
+        search_server.AddDocument(document_id, document, status, ratings);
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка добавления документа " << document_id << ": " << e.what() << std::endl;
+    }
+}
+
+void FindTopDocuments(const SearchServer& search_server, const std::string& raw_query) {
+    std::cout << "Результаты поиска по запросу: " << raw_query << std::endl;
+    try {
+        for (const Document& document : search_server.FindTopDocuments(raw_query)) {
+            PrintDocument(document);
+        }
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка поиска: " << e.what() << std::endl;
+    }
+}
+
+void MatchDocuments(const SearchServer& search_server, const std::string& query) {
+    try {
+        std::cout << "Document matching on query: " << query << std::endl;
+        const int document_count = search_server.GetDocumentCount();
+        for (int index = 0; index < document_count; ++index) {
+            const int document_id = search_server.GetDocumentId(index);
+            const auto [words, status] = search_server.MatchDocument(query, document_id);
+            PrintMatchDocumentResult(document_id, words, status);
+        }
+    } catch (const std:: invalid_argument& e) {
+        std::cout << "Document matching error on query " << query << ": " << e.what() << std::endl;
+    }
+}
+
+
 std::vector<std::string> SearchServer::SplitIntoWordsNoStop(
         const std::string& text) const {
     std::vector<std::string> words;
 
     for (const std::string& word : SplitIntoWords(text)) {
         if (!IsValidWord(word)) {
-            throw std::invalid_argument("document contains special symbols"s);
+            throw std::invalid_argument(std::string("document contains special symbols"));
         }
 
         if (!IsStopWord(word)) {

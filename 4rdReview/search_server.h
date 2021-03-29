@@ -10,9 +10,10 @@
 #include <string>
 #include <vector>
 #include <set>
-using namespace std::string_literals;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
+
+
 
 class SearchServer {
 public:
@@ -22,7 +23,7 @@ public:
             : stop_words_(MakeUniqueNonEmptyStrings(stop_words))  // Extract non-empty stop words
     {
         if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
-            throw std::invalid_argument("Some of stop words are invalid"s);
+            throw std::invalid_argument(std::string("Some of stop words are invalid"));
         }
     }
 
@@ -37,7 +38,7 @@ public:
         auto matched_documents = FindAllDocuments(query, document_predicate);
 
         sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-            if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+            if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
                 return lhs.rating > rhs.rating;
             } else {
                 return lhs.relevance > rhs.relevance;
@@ -121,3 +122,8 @@ private:
         return matched_documents;
     }
 };
+
+void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
+                 const std::vector<int>& ratings);
+void FindTopDocuments(const SearchServer& search_server, const std::string& raw_query);
+void MatchDocuments(const SearchServer& search_server, const std::string& query);

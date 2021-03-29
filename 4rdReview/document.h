@@ -1,8 +1,7 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include <vector>
-using namespace std::string_literals;
-
 
 struct Document {
     Document() = default;
@@ -13,10 +12,15 @@ struct Document {
 };
 
 std::ostream& operator<<(std::ostream& out, const Document& document);
-
 enum class DocumentStatus {
     ACTUAL,
-        IRRELEVANT,
-        BANNED,
-        REMOVED
-    };
+    IRRELEVANT,
+    BANNED,
+    REMOVED,
+
+};
+
+
+void PrintDocument(const Document& document);
+void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& words, DocumentStatus status);
+
