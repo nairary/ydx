@@ -1,9 +1,7 @@
 #include <iostream>
 #include <string>
-#include <thread>
 #include "search_server.h"
 #include "request_queue.h"
-#include "log_duration.h"
 #include "paginator.h"
 #include "remove_duplicates.h"
 #include "read_input_functions.h"

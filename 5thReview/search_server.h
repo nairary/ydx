@@ -1,7 +1,7 @@
 #pragma once
 
-#include "document.h"
 #include "string_processing.h"
+#include "test_example_functions.h"
 
 #include <map>
 #include <algorithm>
@@ -37,7 +37,7 @@ public:
 
         auto matched_documents = FindAllDocuments(query, document_predicate);
 
-        sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
+        std::sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
             if (std::abs(lhs.relevance - rhs.relevance) < 1e-6) {
                 return lhs.rating > rhs.rating;
             } else {
@@ -67,7 +67,7 @@ public:
     void RemoveDocument(int document_id);
 
     void RemoveDuplicates(SearchServer& search_server);
-
+    
 private:
     struct DocumentData {
         int rating;
@@ -138,4 +138,3 @@ private:
 
 void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
                  const std::vector<int>& ratings);
-
