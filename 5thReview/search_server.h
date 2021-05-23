@@ -1,7 +1,7 @@
 #pragma once
 
 #include "string_processing.h"
-#include "test_example_functions.h"
+#include "document.h"
 
 #include <map>
 #include <algorithm>
@@ -66,8 +66,6 @@ public:
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
     void RemoveDocument(int document_id);
 
-    void RemoveDuplicates(SearchServer& search_server);
-    
 private:
     struct DocumentData {
         int rating;
@@ -135,6 +133,3 @@ private:
         return matched_documents;
     }
 };
-
-void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
-                 const std::vector<int>& ratings);

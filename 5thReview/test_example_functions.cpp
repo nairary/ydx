@@ -16,4 +16,12 @@ void PrintMatchDocumentResult(int document_id, const std::vector<std::string>& w
     }
     std::cout << "}" << std::endl;
 }
+void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
+                 const std::vector<int>& ratings) {
+    try {
+        search_server.AddDocument(document_id, document, status, ratings);
+    } catch (const std::invalid_argument& e) {
+        std::cout << "Ошибка добавления документа " << document_id << ": " << e.what() << std::endl;
+    }
+}
 

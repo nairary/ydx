@@ -99,15 +99,6 @@ double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) con
     return std::log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
 }
 
-void AddDocument(SearchServer& search_server, int document_id, const std::string& document, DocumentStatus status,
-                 const std::vector<int>& ratings) {
-    try {
-        search_server.AddDocument(document_id, document, status, ratings);
-    } catch (const std::invalid_argument& e) {
-        std::cout << "Ошибка добавления документа " << document_id << ": " << e.what() << std::endl;
-    }
-}
-
 std::set<int>::const_iterator SearchServer::end() const {
     return  document_ids_.cend();
 }
@@ -167,7 +158,7 @@ void SearchServer::RemoveDocument(int document_id) {
     document_ids_.erase(document_id);
     documents_.erase(document_id);
     document_to_word_freqs_.erase(document_id);
-    
+
 }
 
 std::set<int>::const_iterator SearchServer::begin() const {

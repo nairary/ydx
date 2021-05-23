@@ -14,9 +14,11 @@ public:
     using Clock = std::chrono::steady_clock;
 
     LogDuration(const std::string& id, std::ostream& dst_stream = std::cerr)
-            : id_(id),
-            dst_stream_(dst_stream),    
+            : id_(id)
+            ,dst_stream_(dst_stream)
+
     {
+
     }
 
     ~LogDuration() {

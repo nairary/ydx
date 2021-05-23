@@ -5,6 +5,8 @@
 #include "paginator.h"
 #include "remove_duplicates.h"
 #include "read_input_functions.h"
+#include "log_duration.h"
+#include "test_example_functions.h"
 
 using namespace std::string_literals;
 

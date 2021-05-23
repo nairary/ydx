@@ -1,17 +1,18 @@
+#include "remove_duplicates.h"
+
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include "search_server.h"
 
 void RemoveDuplicates(SearchServer& search_server){
     std::set<std::set<std::string>> docs;
     std::vector<int> ids_to_remove;
-    for (int document_id : search_server) {        
-        std::set<std::string> keys; 
-        for (auto& [word, freq] : search_server.GetWordFrequencies(document_id)) 
-        { 
+    for (int document_id : search_server) {
+        std::set<std::string> keys;
+        for (const auto& [word, freq] : search_server.GetWordFrequencies(document_id))
+        {
             keys.insert(word);
         }
         if (!docs.insert(keys).second) {
