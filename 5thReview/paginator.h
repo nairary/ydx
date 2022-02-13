@@ -3,6 +3,9 @@
 #include <vector>
 #include <algorithm>
 
+//Класс-шаблон, разбивающий результаты запроса на страницы,
+//"страница" - два итератора с указанием на начало и конец диапозона в контейнере
+
 template <typename Iterator>
 class IteratorRange {
 public:
